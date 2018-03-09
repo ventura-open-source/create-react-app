@@ -33,6 +33,13 @@ var dotenvFiles = [
   paths.dotenv,
 ].filter(Boolean);
 
+// Add dotfiles using own environenmets and
+// multiproject variables if it's necesary
+const VENTURA_ENV = process.env.VENTURA_ENV;
+const VENTURA_PROJECT = process.env.VENTURA_PROJECT;
+dotenvFiles.push(`${paths.dotenv}.${VENTURA_ENV}`);
+dotenvFiles.push(`${paths.dotenv}.${VENTURA_PROJECT}`);
+
 // Load environment variables from .env* files. Suppress warnings using silent
 // if this file is missing. dotenv will never modify any environment variables
 // that have already been set.  Variable expansion is supported in .env files.
@@ -67,10 +74,11 @@ process.env.NODE_PATH = (process.env.NODE_PATH || '')
 // Grab NODE_ENV and REACT_APP_* environment variables and prepare them to be
 // injected into the application via DefinePlugin in Webpack configuration.
 const REACT_APP = /^REACT_APP_/i;
+const VENTURA_APP = /^VENTURA_APP_/i;
 
 function getClientEnvironment(publicUrl) {
   const raw = Object.keys(process.env)
-    .filter(key => REACT_APP.test(key))
+    .filter(key => REACT_APP.test(key) || VENTURA_APP.test(key))
     .reduce(
       (env, key) => {
         env[key] = process.env[key];
